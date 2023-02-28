@@ -1,0 +1,39 @@
+[build-system]
+# Minimum requirements for the build system to execute.
+requires = ["setuptools", "wheel"]  # PEP 508 specifications.
+
+[project]
+name = "egm_dataset_generator"
+authors = [
+    {name = "Anton Rybkin"},
+    {name = "Ruslan Smirnov"},
+]
+description = "Set of tools to generate dataset from egm signals and labels of heartbeats"
+readme = "README.md"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+dev = [
+    "egm_dataset_generator[test]",
+    "flake8",
+    "mypy",
+    "pre-commit",
+    "types-tqdm",
+]
+
+[tool.setuptools.packages.find]
+exclude = ["test"]
+
+[tool.setuptools.package-data]
+egm_dataset_generator = ["py.typed"]
+
+[project.scripts]
+generate_dataset = "egm_dataset_generator.cli:main"
