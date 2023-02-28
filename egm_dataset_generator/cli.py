@@ -65,7 +65,7 @@ def parse_args() -> EGMDatasetGeneratorNamespace:
     parser.add_argument(
         '--label_transform',
         type=dispatch_transform,
-        help='Type of label transform',
+        help=f'Type of label transform, choices are: {", ".join(get_args(AVAILABLE_TRANSFORMS))}',
         default='sin',
     )
 
