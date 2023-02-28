@@ -21,8 +21,12 @@ dependencies = [
 test = [
     "pytest",
 ]
+notebook = [
+    "notebook",
+    "matplotlib",
+]
 dev = [
-    "egm_dataset_generator[test]",
+    "egm_dataset_generator[test,notebook]",
     "flake8",
     "mypy",
     "pre-commit",
