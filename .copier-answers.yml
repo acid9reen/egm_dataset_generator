@@ -7,4 +7,3 @@ project_name: EGM dataset generator
 project_short_description: Set of tools to generate dataset from egm signals and labels
     of heartbeats
 python_version: '3.10'
-
