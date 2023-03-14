@@ -20,12 +20,12 @@ Secs = int
 
 
 def _get_labels_per_channel_peaks_length(
-        labels_paths: list[Path],
+    labels_paths: list[Path],
 ) -> dict[Path, list[int]]:
     label_path_peaks_length: dict[Path, list[int]] = {}
 
     for file_path in labels_paths:
-        with open(str(file_path), 'r') as label_file:
+        with open(str(file_path), "r") as label_file:
             peaks = json.load(label_file)
             peaks_lengths = list(map(len, peaks))
             label_path_peaks_length[file_path] = peaks_lengths
@@ -48,23 +48,23 @@ def _get_signal_path_from_label_path(label_path: Path, signals_location: str) ->
     #   ...
 
     label_filename = label_path.stem
-    signal_filaname = ''.join(['X', label_filename[1:], '.npy'])
+    signal_filaname = "".join(["X", label_filename[1:], ".npy"])
 
     return label_path.parent.parent / signals_location / signal_filaname
 
 
 class DatasetGenerator:
-    SIGNALS_LOCATION = 'X'
-    LABELS_LOCATION = 'Y'
+    SIGNALS_LOCATION = "X"
+    LABELS_LOCATION = "Y"
     FREQUENCY = 5000
     N_CHANNELS = 64
 
     def __init__(
-            self,
-            raw_data_path: str,
-            trim_by: Secs,
-            limit: int,
-            out_folder_path: str,
+        self,
+        raw_data_path: str,
+        trim_by: Secs,
+        limit: int,
+        out_folder_path: str,
     ) -> None:
         self.raw_data_path = Path(raw_data_path)
         self.sample_length = trim_by * self.FREQUENCY
@@ -81,9 +81,9 @@ class DatasetGenerator:
 
     def _get_labels_files(self) -> list[Path]:
         labels_path = self.raw_data_path / self.LABELS_LOCATION
-        label_files = [filepath for filepath in labels_path.glob('*.json')]
+        label_files = [filepath for filepath in labels_path.glob("*.json")]
 
-        logger.info(f'Found {len(label_files)} label files in {labels_path}')
+        logger.info(f"Found {len(label_files)} label files in {labels_path}")
 
         return label_files
 
@@ -114,15 +114,15 @@ class DatasetGenerator:
         return select_instructions
 
     def _save_select_results(self, select_results: list[SelectResult]) -> None:
-        header = ['x_file_path', 'y_file_path', 'num_peaks', 'channel']
+        header = ["x_file_path", "y_file_path", "num_peaks", "channel"]
 
-        with open(os.path.join(self.out_foder_path, 'dataset.csv'), 'w') as out:
+        with open(os.path.join(self.out_foder_path, "dataset.csv"), "w") as out:
             csv_writer = csv.writer(
                 out,
-                delimiter=',',
+                delimiter=",",
                 quotechar='"',
                 quoting=csv.QUOTE_MINIMAL,
-                lineterminator='\n',
+                lineterminator="\n",
             )
 
             csv_writer.writerow(header)
@@ -135,8 +135,8 @@ class DatasetGenerator:
         selector = Selector(
             self.sample_length,
             self.out_foder_path,
-            'x',
-            'y',
+            "x",
+            "y",
             label_transformer,
         )
 

@@ -5,7 +5,7 @@ from typing import Protocol
 import numpy as np
 
 
-AVAILABLE_TRANSFORMS = Literal['identity', 'sin', 'abs']
+AVAILABLE_TRANSFORMS = Literal["identity", "sin", "abs"]
 
 
 class LabelTransformer(Protocol):
@@ -15,22 +15,21 @@ class LabelTransformer(Protocol):
 
 def dispatch_transform(transform: AVAILABLE_TRANSFORMS | str) -> LabelTransformer:
     match transform:
-        case 'identity':
+        case "identity":
             return IdentityTransformer()
-        case 'sin':
+        case "sin":
             return WaveTransformer(20)
-        case 'abs':
+        case "abs":
             return TriangleTransformer(20)
         case _:
             raise NotImplementedError(
-                f'There is no transformation with name {transform}, '
-                f'available transformations are: {get_args(AVAILABLE_TRANSFORMS)}',
+                f"There is no transformation with name {transform}, "
+                f"available transformations are: {get_args(AVAILABLE_TRANSFORMS)}",
             )
 
 
 class IdentityTransformer(object):
-    """Fake transformer, just for default value
-    """
+    """Fake transformer, just for default value"""
 
     def transform(self, label: np.ndarray) -> np.ndarray:
         return label
@@ -59,16 +58,15 @@ class WaveTransformer(object):
         sin = np.array(sin_list)
 
         for peak_index in peaks_indexes:
-
             if peak_index - half_window_size <= 0:
                 right_slice_boarder = peak_index + half_window_size
 
-                label[:right_slice_boarder] = sin[len(sin) - (right_slice_boarder):]
+                label[:right_slice_boarder] = sin[len(sin) - (right_slice_boarder) :]
 
             elif peak_index + half_window_size >= len(label):
                 left_slice_boarder = peak_index - half_window_size - 1
 
-                label[left_slice_boarder:] = sin[:len(label[left_slice_boarder:])]
+                label[left_slice_boarder:] = sin[: len(label[left_slice_boarder:])]
             else:
                 left_slice_boarder = peak_index - half_window_size - 1
                 right_slice_boarder = peak_index + half_window_size
@@ -101,16 +99,17 @@ class TriangleTransformer(object):
         absolute = np.array(absolute_list)
 
         for peak_index in peaks_indexes:
-
             if peak_index - half_window_size < 0:
                 right_slice_boarder = peak_index + half_window_size
 
-                label[:right_slice_boarder] = absolute[len(absolute) - (right_slice_boarder):]
+                label[:right_slice_boarder] = absolute[
+                    len(absolute) - (right_slice_boarder) :
+                ]
 
             elif peak_index + half_window_size > len(label):
                 left_slice_boarder = peak_index - half_window_size - 1
 
-                label[left_slice_boarder:] = absolute[:len(label[left_slice_boarder:])]
+                label[left_slice_boarder:] = absolute[: len(label[left_slice_boarder:])]
             else:
                 left_slice_boarder = peak_index - half_window_size - 1
                 right_slice_boarder = peak_index + half_window_size

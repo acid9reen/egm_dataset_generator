@@ -24,12 +24,12 @@ class SelectResult(NamedTuple):
 
 class Selector:
     def __init__(
-            self,
-            sample_length: int,
-            out_folder_path: str = 'generated_data',
-            processed_xs_out_folder: str = 'x',
-            processed_ys_out_folder: str = 'y',
-            label_transformer: LabelTransformer = IdentityTransformer(),
+        self,
+        sample_length: int,
+        out_folder_path: str = "generated_data",
+        processed_xs_out_folder: str = "x",
+        processed_ys_out_folder: str = "y",
+        label_transformer: LabelTransformer = IdentityTransformer(),
     ) -> None:
         self.sample_length = sample_length
         self.label_transformer = label_transformer
@@ -41,19 +41,18 @@ class Selector:
         os.makedirs(self.processed_ys_path, exist_ok=True)
 
     def _save(self, x: np.ndarray, y: np.ndarray, filename: str) -> None:
-        with open(os.path.join(self.processed_xs_path, filename), 'wb') as xs_out:
+        with open(os.path.join(self.processed_xs_path, filename), "wb") as xs_out:
             np.save(xs_out, x)
 
-        with open(os.path.join(self.processed_ys_path, filename), 'wb') as ys_out:
+        with open(os.path.join(self.processed_ys_path, filename), "wb") as ys_out:
             np.save(ys_out, y)
 
     def select(
-            self,
-            signal: np.ndarray,
-            label: list[int],
-            select_instruction: SelectInstruction,
+        self,
+        signal: np.ndarray,
+        label: list[int],
+        select_instruction: SelectInstruction,
     ) -> SelectResult:
-
         peak = label[select_instruction.peak_index]
 
         max_index = len(signal) - 1
@@ -71,7 +70,7 @@ class Selector:
             right_index = peak + self.sample_length - select_instruction.shift - 1
             left_index = peak - select_instruction.shift
 
-        selected_signal = signal[left_index:right_index + 1]
+        selected_signal = signal[left_index : right_index + 1]
         selected_peaks = list(filter(lambda x: left_index <= x <= right_index, label))
 
         selected_label = np.zeros(len(selected_signal))
@@ -82,11 +81,11 @@ class Selector:
         transformed_label = self.label_transformer.transform(selected_label)
 
         sample_file_name = (
-            f'{select_instruction.label_path.stem}'
-            f'_{select_instruction.channel_index}'
-            f'_{left_index}'
-            f'_{right_index}'
-            f'.npy'
+            f"{select_instruction.label_path.stem}"
+            f"_{select_instruction.channel_index}"
+            f"_{left_index}"
+            f"_{right_index}"
+            f".npy"
         )
 
         self._save(selected_signal, transformed_label, sample_file_name)

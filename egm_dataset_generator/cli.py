@@ -12,13 +12,13 @@ from egm_dataset_generator.label_transformers import dispatch_transform
 from egm_dataset_generator.label_transformers import LabelTransformer
 
 
-LOG_FILE = '.log'
+LOG_FILE = ".log"
 
 
 # Logger configuration
 logging.basicConfig(
     level=logging.INFO,
-    format='[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
+    format="[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
     handlers=[
         logging.FileHandler(LOG_FILE),
     ],
@@ -45,38 +45,43 @@ def parse_args() -> EGMDatasetGeneratorNamespace:
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '--random_seed', help='Fixed random seed', default=420,
+        "--random_seed",
+        help="Fixed random seed",
+        default=420,
     )
 
     parser.add_argument(
-        '--trim_by',
+        "--trim_by",
         type=seconds,
-        help='Desired length of a signal to generate in seconds',
+        help="Desired length of a signal to generate in seconds",
         default=2,
     )
 
     parser.add_argument(
-        '-l', '--limit',
+        "-l",
+        "--limit",
         type=int,
-        help='Number of signals to generate (size of desired dataset)',
+        help="Number of signals to generate (size of desired dataset)",
         default=10,
     )
 
     parser.add_argument(
-        '--label_transform',
+        "--label_transform",
         type=dispatch_transform,
         help=f'Type of label transform, choices are: {", ".join(get_args(AVAILABLE_TRANSFORMS))}',
-        default='sin',
+        default="sin",
     )
 
     parser.add_argument(
-        'raw_data_root', help='Path to files to generate dataset from',
+        "raw_data_root",
+        help="Path to files to generate dataset from",
     )
 
     parser.add_argument(
-        '-o', '--output_folder',
-        help='Location to store generated dataset',
-        default='./egm_dataset',
+        "-o",
+        "--output_folder",
+        help="Location to store generated dataset",
+        default="./egm_dataset",
     )
 
     return parser.parse_args(namespace=EGMDatasetGeneratorNamespace())
@@ -88,10 +93,10 @@ def seed_everything(seed: int) -> None:
     """
 
     random.seed(seed)
-    os.environ['PYTHONHASHSEED'] = str(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)
 
-    logger.info(f'Fix random seed with value: {seed}!')
+    logger.info(f"Fix random seed with value: {seed}!")
 
 
 def main() -> int:
