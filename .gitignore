@@ -161,3 +161,10 @@ cython_debug/
 
 # VSCode
 .vscode/
+
+# Output files
+*.npy
+*.csv
+
+# Default output path
+egm_dataset/

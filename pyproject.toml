@@ -21,8 +21,12 @@ dependencies = [
 test = [
     "pytest",
 ]
+notebook = [
+    "notebook",
+    "matplotlib",
+]
 dev = [
-    "egm_dataset_generator[test]",
+    "egm_dataset_generator[test,notebook]",
     "flake8",
     "mypy",
     "pre-commit",
@@ -37,3 +41,25 @@ egm_dataset_generator = ["py.typed"]
 
 [project.scripts]
 generate_dataset = "egm_dataset_generator.cli:main"
+
+[tool.mypy]
+disallow_untyped_defs = true
+disallow_any_unimported = true
+no_implicit_optional = true
+check_untyped_defs = true
+warn_return_any = true
+warn_unused_ignores = true
+show_error_codes = true
+exclude = '''(?x)^(
+    .git/|
+    .venv/|
+    venv/|
+  )$'''
+
+[tool.black]
+line-length = 89
+extend-exclude = '''(?x)^(
+    .git/|
+    .venv/|
+    venv/|
+  )$'''
