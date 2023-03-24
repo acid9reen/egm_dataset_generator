@@ -48,9 +48,9 @@ def _get_signal_path_from_label_path(label_path: Path, signals_location: str) ->
     #   ...
 
     label_filename = label_path.stem
-    signal_filaname = "".join(["X", label_filename[1:], ".npy"])
+    signal_filename = "".join(["X", label_filename[1:], ".npy"])
 
-    return label_path.parent.parent / signals_location / signal_filaname
+    return label_path.parent.parent / signals_location / signal_filename
 
 
 class DatasetGenerator:
@@ -69,7 +69,7 @@ class DatasetGenerator:
         self.raw_data_path = Path(raw_data_path)
         self.sample_length = trim_by * self.FREQUENCY
         self.limit = limit
-        self.out_foder_path = out_folder_path
+        self.out_folder_path = out_folder_path
         self.label_paths = self._get_labels_files()
         self.labels_per_channel_peaks_length = _get_labels_per_channel_peaks_length(
             self.label_paths,
@@ -87,7 +87,7 @@ class DatasetGenerator:
 
         return label_files
 
-    def _generate_select_insruction(self) -> SelectInstruction:
+    def _generate_select_instruction(self) -> SelectInstruction:
         label_file_path = random.choice(self.label_paths)
 
         peaks_lengths = self.labels_per_channel_peaks_length[label_file_path]
@@ -108,7 +108,7 @@ class DatasetGenerator:
     def _get_select_instructions(self) -> list[SelectInstruction]:
         select_instructions: list[SelectInstruction] = []
         for __ in range(self.limit):
-            select_instruction = self._generate_select_insruction()
+            select_instruction = self._generate_select_instruction()
             select_instructions.append(select_instruction)
 
         return select_instructions
@@ -116,7 +116,7 @@ class DatasetGenerator:
     def _save_select_results(self, select_results: list[SelectResult]) -> None:
         header = ["x_file_path", "y_file_path", "num_peaks", "channel"]
 
-        with open(os.path.join(self.out_foder_path, "dataset.csv"), "w") as out:
+        with open(os.path.join(self.out_folder_path, "dataset.csv"), "w") as out:
             csv_writer = csv.writer(
                 out,
                 delimiter=",",
@@ -134,7 +134,7 @@ class DatasetGenerator:
         select_instructions = self._get_select_instructions()
         selector = Selector(
             self.sample_length,
-            self.out_foder_path,
+            self.out_folder_path,
             "x",
             "y",
             label_transformer,
