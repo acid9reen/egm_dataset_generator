@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import NamedTuple
 
 import numpy as np
-
 from egm_dataset_generator.label_transformers import IdentityTransformer
 from egm_dataset_generator.label_transformers import LabelTransformer
 

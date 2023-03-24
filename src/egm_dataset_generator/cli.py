@@ -5,7 +5,6 @@ import random
 from typing import get_args
 
 import numpy as np
-
 from egm_dataset_generator.generate_dataset import DatasetGenerator
 from egm_dataset_generator.label_transformers import AVAILABLE_TRANSFORMS
 from egm_dataset_generator.label_transformers import dispatch_transform
