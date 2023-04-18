@@ -34,7 +34,7 @@ dev = [
 ]
 
 [project.scripts]
-generate_dataset = "egm_dataset_generator.cli:main"
+segment_dataset = "egm_dataset_generator.cli.segmentator:main"
 
 [tool.mypy]
 disallow_untyped_defs = true
