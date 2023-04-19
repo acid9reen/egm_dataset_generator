@@ -1,15 +1,19 @@
 import argparse
+import multiprocessing as mp
 from pathlib import Path
 from typing import Callable
 from typing import Iterable
 
 import numpy as np
+from egm_dataset_generator.tranformations import standardize
+from tqdm import tqdm
 
 
 class PreprocessorNamespace(argparse.ArgumentParser):
     signals_folder: Path
     labels_folder: Path
     output_folder_name: Path
+    num_workers: int
 
 
 def parse_args() -> PreprocessorNamespace:
@@ -33,6 +37,13 @@ def parse_args() -> PreprocessorNamespace:
         help="Output folder name",
         default="interim",
     )
+    parser.add_argument(
+        "-w",
+        "--num_workers",
+        type=int,
+        help="Number of workers for multiprocessing",
+        default=1,
+    )
 
     return parser.parse_args(namespace=PreprocessorNamespace())
 
@@ -40,11 +51,13 @@ def parse_args() -> PreprocessorNamespace:
 class SignalProcessor(object):
     def __init__(
         self,
-        transformations: Iterable[Callable[[np.ndarray, np.ndarray], None]],
+        transformations: Iterable[Callable[[np.ndarray], np.ndarray]],
         output_folder: Path,
+        num_workers: int,
     ) -> None:
         self.transformations = transformations
         self.output_folder = output_folder
+        self.num_workers = num_workers
 
     def preprocess_signal(self, signal_path: Path) -> None:
         interim_signal_path = self.output_folder / signal_path.name
@@ -52,31 +65,47 @@ class SignalProcessor(object):
         if interim_signal_path.exists():
             return
 
-        raw_signal = np.load(signal_path, "r")
-        interim_signal = np.memmap(
-            interim_signal_path,
-            dtype=np.float32,
-            mode="w+",
-            shape=raw_signal.shape,
-        )
+        signal = np.load(signal_path)
 
         for transform in self.transformations:
-            transform(raw_signal, interim_signal)
+            signal = transform(signal)
 
-    def preprocess_signals(self, signals_paths: Iterable[Path]) -> None:
-        for signal_path in signals_paths:
-            self.preprocess_signal(signal_path)
+        np.save(interim_signal_path, signal)
+
+    def preprocess_signals(self, signals_paths: list[Path]) -> None:
+        with mp.Pool(self.num_workers) as pool:
+            for __ in tqdm(
+                pool.imap_unordered(
+                    self.preprocess_signal,
+                    signals_paths,
+                    chunksize=len(signals_paths) // self.num_workers,
+                ),
+                desc="Processing signal files",
+                colour="green",
+                total=len(signals_paths),
+            ):
+                ...
 
 
 def main() -> int:
     args = parse_args()
-    signals = args.signals_folder.glob("*.npy")
+    signals = list(args.signals_folder.glob("*.npy"))
     # labels = args.labels_folder.glob('*.json')
 
-    output_folder = args.signals_folder.parent.parent / args.output_folder_name
+    output_folder = (
+        args.signals_folder.parent.parent
+        / args.output_folder_name
+        / args.signals_folder.name
+    )
     output_folder.mkdir(exist_ok=True)
 
-    signal_preprocessor = SignalProcessor([], output_folder)
+    transformations = [standardize]
+
+    signal_preprocessor = SignalProcessor(
+        transformations,
+        output_folder,
+        args.num_workers,
+    )
     signal_preprocessor.preprocess_signals(signals)
 
     return 0
