@@ -31,6 +31,7 @@ repos:
     rev: v3.8.2
     hooks:
     -   id: reorder-python-imports
+        args: ["--application-directories=.:src"]
 
 # Trailing comma
 -   repo: https://github.com/asottile/add-trailing-comma
