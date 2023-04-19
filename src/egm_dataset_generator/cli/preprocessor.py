@@ -5,8 +5,9 @@ from typing import Callable
 from typing import Iterable
 
 import numpy as np
-from egm_dataset_generator.tranformations import standardize
 from tqdm import tqdm
+
+from egm_dataset_generator.tranformations import standardize
 
 
 class PreprocessorNamespace(argparse.ArgumentParser):

@@ -5,10 +5,11 @@ from pathlib import Path
 from typing import Callable
 
 import numpy as np
+from tqdm import tqdm
+
 from egm_dataset_generator.selector import SelectInstruction
 from egm_dataset_generator.selector import Selector
 from egm_dataset_generator.selector import SelectResult
-from tqdm import tqdm
 
 
 class RawDataProcessor:
