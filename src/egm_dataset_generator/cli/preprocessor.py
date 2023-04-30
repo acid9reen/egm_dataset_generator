@@ -7,12 +7,13 @@ from typing import Iterable
 import numpy as np
 from tqdm import tqdm
 
+from egm_dataset_generator.peaks_fixer import LabelProcessor
 from egm_dataset_generator.tranformations import standardize
 
 
 class PreprocessorNamespace(argparse.ArgumentParser):
     signals_folder: Path
-    labels_folder: Path
+    labels_folder: Path | None
     output_folder_name: Path
     num_workers: int
 
@@ -30,6 +31,7 @@ def parse_args() -> PreprocessorNamespace:
         "--labels_folder",
         type=Path,
         help="Path to .json labels files",
+        default=None,
     )
     parser.add_argument(
         "-o",
@@ -91,20 +93,35 @@ class SignalProcessor(object):
 def main() -> int:
     args = parse_args()
     signals = list(args.signals_folder.glob("*.npy"))
-    # labels = args.labels_folder.glob('*.json')
 
-    output_folder = (
+    if args.labels_folder is not None:
+        labels = args.labels_folder.glob("*.json")
+
+        labels_output_folder = (
+            args.labels_folder.parent.parent
+            / args.output_folder_name
+            / args.labels_folder.name
+        )
+        labels_output_folder.mkdir(exist_ok=True)
+
+        label_signal = {
+            label_path: args.signals_folder / f"X{label_path.stem[1:]}.npy"
+            for label_path in labels
+        }
+        LabelProcessor(labels_output_folder).process_labels(label_signal)
+
+    signals_output_folder = (
         args.signals_folder.parent.parent
         / args.output_folder_name
         / args.signals_folder.name
     )
-    output_folder.mkdir(exist_ok=True)
+    signals_output_folder.mkdir(exist_ok=True)
 
     transformations = [standardize]
 
     signal_preprocessor = SignalProcessor(
         transformations,
-        output_folder,
+        signals_output_folder,
         args.num_workers,
     )
     signal_preprocessor.preprocess_signals(signals)
