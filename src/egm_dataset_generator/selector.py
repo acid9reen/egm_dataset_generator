@@ -6,6 +6,7 @@ import numpy as np
 
 from egm_dataset_generator.label_transformers import IdentityTransformer
 from egm_dataset_generator.label_transformers import LabelTransformer
+from egm_dataset_generator.transforms import scale
 
 
 class SelectInstruction(NamedTuple):
@@ -42,7 +43,7 @@ class Selector:
 
     def _save(self, x: np.ndarray, y: np.ndarray, filename: str) -> None:
         with open(os.path.join(self.processed_xs_path, filename), "wb") as xs_out:
-            np.save(xs_out, x)
+            np.save(xs_out, scale(x))
 
         with open(os.path.join(self.processed_ys_path, filename), "wb") as ys_out:
             np.save(ys_out, y)

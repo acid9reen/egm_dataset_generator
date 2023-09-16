@@ -1,14 +1,18 @@
 import argparse
 import multiprocessing as mp
+from functools import partial
 from pathlib import Path
 from typing import Callable
 from typing import Iterable
 
 import numpy as np
+from scipy.signal import decimate
 from tqdm import tqdm
 
 from egm_dataset_generator.peaks_fixer import LabelProcessor
-from egm_dataset_generator.tranformations import standardize
+
+
+Q: int | None = None
 
 
 class PreprocessorNamespace(argparse.ArgumentParser):
@@ -102,7 +106,7 @@ def main() -> int:
             / args.output_folder_name
             / args.labels_folder.name
         )
-        labels_output_folder.mkdir(exist_ok=True)
+        labels_output_folder.mkdir(exist_ok=True, parents=True)
 
         label_signal = {
             label_path: args.signals_folder / f"X{label_path.stem[1:]}.npy"
@@ -117,10 +121,14 @@ def main() -> int:
     )
     signals_output_folder.mkdir(exist_ok=True)
 
-    transformations = [standardize]
+    transforms = []
+
+    if Q is not None:
+        downsample = partial(decimate, q=Q)
+        transforms.append(downsample)  # type: ignore
 
     signal_preprocessor = SignalProcessor(
-        transformations,
+        transforms,
         signals_output_folder,
         args.num_workers,
     )
